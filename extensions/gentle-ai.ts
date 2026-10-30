@@ -11481,7 +11481,7 @@ function createGentleAiExtensionForTesting(
 			if (primaryToolCall) {
 				const launch = event.input as Record<string, unknown>;
 				const selected = [launch.workspace_root, launch.repository_root].find((value): value is string => typeof value === "string" && value.trim() !== "");
-				const root = selected ? resolve(ctx.cwd, selected) : ctx.cwd;
+				const root = selected ? resolve(ctx.cwd, selected) : (resolveSessionWorktree(ctx.cwd, ctx.cwd)?.root ?? ctx.cwd);
 				const undocumentedWriter = rejectUndocumentedWriterLaunch(event.input, { root, contextUsage: ctx.getContextUsage?.(), env: permissionEnvironment });
 				if (undocumentedWriter) return undocumentedWriter;
 				const unriskedVerifier = rejectUnriskedVerifierLaunch(event.input, { root, contextUsage: ctx.getContextUsage?.(), env: permissionEnvironment });

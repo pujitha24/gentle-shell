@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -153,4 +154,14 @@ test("S16: child sessions are exempt and an empty workspace_root falls back to t
 	assert.equal(child?.block, undefined, "a child session is not gated");
 	const emptyRoot = await launchThroughHook({ agent: "gentle-ai-worker", mode: "background", workspace_root: "", task: `Spec: odd/tasks/ledger.md, T1${surfaces}` }, documented, 0);
 	assert.equal(emptyRoot?.block, undefined, "an empty workspace_root means the session cwd");
+});
+
+test("S16: a canonical Spec launch from a repository subdirectory resolves against the worktree root", async (t) => {
+	const repo = realpathSync(workspace(true));
+	t.after(() => rmSync(repo, { recursive: true, force: true }));
+	execFileSync("git", ["init", "-q"], { cwd: repo });
+	const sub = join(repo, "frontend");
+	mkdirSync(sub);
+	const admitted = await launchThroughHook({ agent: "gentle-ai-worker", mode: "background", task: `Spec: odd/tasks/ledger.md, T1${surfaces}` }, sub, 0);
+	assert.equal(admitted?.block, undefined, "the document is found at the worktree root, not under the subdirectory");
 });
