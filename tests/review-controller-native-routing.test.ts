@@ -875,6 +875,7 @@ test("route retention caps, rejects collisions and invalid selectors, and clears
 		const result = await __testing.executeReviewControllerOperation({ operation: "status", input: JSON.stringify(value) }, process.cwd(), { targetStatus: async () => { calls += 1; return status("unreachable"); } } as unknown as NativeReviewCli);
 		assert.equal(result.outcome, "native-status-input-invalid");
 	}
+	assert.deepEqual(rejected.diagnostics, { code: "capture-route-registration-rejected", message: "Provider collectBinding collides with a different registered route" });
 	assert.deepEqual({ routes: selections.size, evicted: evicted.outcome, collision: rejected.outcome, calls }, { routes: 64, evicted: "capture-binding-rejected", collision: "capture-route-registration-rejected", calls: 0 });
 });
 

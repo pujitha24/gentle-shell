@@ -7867,6 +7867,7 @@ function nativeOperationFailure(operation: ReviewControllerOperation | "gentle_r
 			outcome: "capture-route-registration-rejected",
 			mutation_performed: false,
 			mutation_outcome: "none",
+			diagnostics: { code: "capture-route-registration-rejected", message: error.message },
 		};
 	}
 	const mutationOutcome = value.mutationOutcome === "unknown" ? "unknown" : "none";
